@@ -23,7 +23,7 @@ optional arguments:
   -q, --quite           Output IP addresses only (Use when piping output)
 
 ## Examples 
-1. You have a file (Perhaps output from another tool) called input.txt that you want to extract IP addresses from and output to a file called hosts.txt\
+1. You have a file (Perhaps output from another tool) called input.txt that you want to extract IP addresses from and output to a file called hosts.txt
 
   ./IPCleaner.py input.txt -o hosts.txt
 
