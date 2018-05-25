@@ -5,7 +5,7 @@ import re
 
 # Global variables.
 parser = argparse.ArgumentParser()
-parser.add_argument("input", help="Input list of line seperated IP addresses", metavar="<input-file-name>")
+parser.add_argument("input", help="Input file to extract IP addresses from.", metavar="<input-file-name>")
 parser.add_argument("-o","--output", help="Output file", metavar="<output-file-name>")
 parser.add_argument("-q", "--quite", help="Output IP addresses only", action="store_true")
 args = parser.parse_args()
@@ -53,7 +53,7 @@ def unique(host_list):
 		cli_plus_print("Sorting adresses...")
 		unique_host_list.sort(key=lambda s: list(map(int, s.split('.'))))
 	except Exception as e:
-		cli_negative_print('Failed to sort the IP addresses, are you sure there is only IP addresses in that file?')
+		cli_negative_print('Failed to sort the IP addresses...')
 		sys.exit()
 	else:
 		return unique_host_list
