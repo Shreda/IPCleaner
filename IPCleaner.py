@@ -2,12 +2,18 @@
 import argparse
 import sys
 import re
+from classes.IP import IP
+
 
 # Global variables.
 parser = argparse.ArgumentParser()
-parser.add_argument("input", help="Input file to extract IP addresses from.", metavar="<input-file-name>")
+# parser.add_argument("input", help="Input file to extract IP addresses from.", metavar="<input-file-name>")
 parser.add_argument("-o","--output", help="Output file", metavar="<output-file-name>")
 parser.add_argument("-q", "--quite", help="Output IP addresses only", action="store_true")
+parser.add_argument("-c", "--calc", help="Calculate network information for an IP")
+parser.add_argument("-s", "--search", help="File to extract IP addresses from")
+
+
 args = parser.parse_args()
 
 
@@ -28,22 +34,41 @@ def banner():
 
 
 def main():
-	input_file_name=args.input
-	output_file_name = args.output
 
-	host_list = get_hosts(input_file_name)
+	if args.search:
+		input_file_name=args.search
+		output_file_name = args.output
 
-	if len(host_list) > 0:
-		unique_hosts = unique(host_list)
-		write_output(unique_hosts, output_file_name)
-		cli_plus_print('The Ips have been cleansed...')
-	else:
-		cli_negative_print("No IP addresses found.")
-	
+		host_list = get_hosts(input_file_name)
+
+		if len(host_list) > 0:
+			unique_hosts = unique(host_list)
+			write_output(unique_hosts, output_file_name)
+			cli_plus_print('The Ips have been cleansed...')
+		else:
+			cli_negative_print("No IP addresses found.")
+
+	if args.calc:
+		cli_plus_print('Calculating address information\n')
+		input_host = args.calc
+		split_host = input_host.split('/')
+		ip = split_host[0]
+		mask = '/' + split_host[1]
+		ip_obj = IP(ip, mask)
+		calc_print(ip_obj)
+
+def calc_print(ip_obj):
+	print('{:<19} {:<16} {:<34}'.format('IP Address:', ip_obj.ip_addr, ip_obj.ip_addr_binary))
+	print('{:<19} {:<16} {:<34}'.format('Subnet Mask:', ip_obj.subnet_mask, ip_obj.subnet_mask_binary))
+	print('{:<19} {:<16} {:<34}'.format('Network Address:', ip_obj.network_addr, ip_obj.network_addr_binary))
+	print('{:<19} {:<16} {:<34}'.format('Broadcast Address:', ip_obj.broadcast_addr, ip_obj.broadcast_addr_binary))
+	print('{:<19} {:<16}'.format('Num Hosts:', ip_obj.num_hosts_network))
+	# print( {:>8}'.format(ip_obj.subnet_mask))
+	# print('Network: {}'.format(ip_obj.))
 
 def unique(host_list):
 	# Loops through a list of found IP addresses and moves them to
- 	# another list if they are not already in the list
+	# another list if they are not already in the list
 	unique_host_list = []
 	cli_plus_print("Removing duplicates...")
 	for addr in host_list:
@@ -52,7 +77,7 @@ def unique(host_list):
 	try:
 		cli_plus_print("Sorting adresses...")
 		unique_host_list.sort(key=lambda s: list(map(int, s.split('.'))))
-	except Exception as e:
+	except:
 		cli_negative_print('Failed to sort the IP addresses...')
 		sys.exit()
 	else:
@@ -62,7 +87,7 @@ def unique(host_list):
 def get_hosts(file_name):
 	try:
 		f=open(file_name, "r")
-	except Exception as e:
+	except:
 		cli_negative_print("Input file '{}' not found...".format(file_name))
 		sys.exit()
 	else:
