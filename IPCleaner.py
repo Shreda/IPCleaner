@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o","--output", help="Output file", metavar="<output-file-name>")
 parser.add_argument("-q", "--quite", help="Output IP addresses only", action="store_true")
 parser.add_argument("-c", "--calc", help="Calculate network information for an IP")
-parser.add_argument("-s", "--search", help="File to extract IP addresses from")
+parser.add_argument("-s", "--search", help="File to extract IP addresses from", metavar="<input-file-to-search>")
 
 
 args = parser.parse_args()
@@ -28,13 +28,12 @@ def banner():
    | | |  ___/| |    | |/ _ \/ _` | '_ \ / _ \ '__|
   _| |_| |    | |____| |  __/ (_| | | | |  __/ |   
  |_____|_|     \_____|_|\___|\__,_|_| |_|\___|_|  
- v0.0.1
+ v0.0.2
 '''
 )
 
 
 def main():
-
 	if args.search:
 		input_file_name=args.search
 		output_file_name = args.output
@@ -44,19 +43,26 @@ def main():
 		if len(host_list) > 0:
 			unique_hosts = unique(host_list)
 			write_output(unique_hosts, output_file_name)
-			cli_plus_print('The Ips have been cleansed...')
-		else:
+			cli_plus_print('The IPs have been cleansed...')
+		else:	
 			cli_negative_print("No IP addresses found.")
 
-	if args.calc:
-		cli_plus_print('Calculating address information\n')
+	elif args.calc:
 		input_host = args.calc
 		split_host = input_host.split('/')
-		ip = split_host[0]
-		mask = '/' + split_host[1]
-		ip_obj = IP(ip, mask)
-		calc_print(ip_obj)
+		try:
+			ip = split_host[0]
+			mask = '/' + split_host[1]
+		except:
+			cli_negative_print('Host passed in incorrect format...')
+			return
 
+		if validate_ip(ip):
+			cli_plus_print('Calculating address information\n')
+			ip_obj = IP(ip, mask)
+			calc_print(ip_obj)
+		else:
+			cli_negative_print('Not a valid IP address...')
 def calc_print(ip_obj):
 	print('{:<19} {:<16} {:<34}'.format('IP Address:', ip_obj.ip_addr, ip_obj.ip_addr_binary))
 	print('{:<19} {:<16} {:<34}'.format('Subnet Mask:', ip_obj.subnet_mask, ip_obj.subnet_mask_binary))
@@ -72,7 +78,7 @@ def unique(host_list):
 	unique_host_list = []
 	cli_plus_print("Removing duplicates...")
 	for addr in host_list:
-		if addr not in unique_host_list:
+		if addr not in unique_host_list and validate_ip(addr):
 			unique_host_list.append(addr)
 	try:
 		cli_plus_print("Sorting adresses...")
@@ -122,6 +128,25 @@ def cli_plus_print(some_string):
 
 def cli_negative_print(some_string):
 	print('[-] {}'.format(some_string))
+
+def validate_ip(ip):
+	try:
+		octet_list = ip.split('.')
+	except:
+		return False
+	else:
+		if len(octet_list) < 4:
+			return False
+
+		for octet in octet_list:
+			try:
+				decimal = int(octet)
+				if decimal > 255 or decimal <= 0:
+					return False
+			except:
+				return False
+	return True
+
 
 
 if __name__ == '__main__':
