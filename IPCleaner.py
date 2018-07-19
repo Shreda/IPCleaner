@@ -49,6 +49,7 @@ def main():
 		else:
 			cli_negative_print('Not a valid IP address...')
 
+
 def calc_print(ip_obj):
 	print('{:<19} {:<16} {:<34}'.format('IP Address:', ip_obj.ip_addr, ip_obj.ip_addr_binary))
 	print('{:<19} {:<16} {:<34}'.format('Subnet Mask:', ip_obj.subnet_mask, ip_obj.subnet_mask_binary))
@@ -56,6 +57,8 @@ def calc_print(ip_obj):
 	print('{:<19} {:<16} {:<34}'.format('Broadcast Address:', ip_obj.broadcast_addr, ip_obj.broadcast_addr_binary))
 	print('{:<19} {:<16}'.format('Num Hosts:', ip_obj.num_hosts_network))
 
+# Takes a list of IP objects and sorts them based on their corresponding
+# IP address
 def unique(host_list):
 	unique_host_list = []
 	unique_host_objects = []
@@ -70,6 +73,7 @@ def unique(host_list):
 	unique_host_objects.sort(key=lambda s: list(map(int, s.ip_addr.split('.'))))
 	return unique_host_objects
 
+# Takes a file and uses a regex to find IP addresses with or withour a CIDR
 def get_hosts(file_name):
 	found_ips = []
 	try:
@@ -90,6 +94,8 @@ def get_hosts(file_name):
 				
 	return found_ips
 
+# Takes a list of IP objects and an optional filename. If a filename is given,
+# The network address and CIDR of the IP addresses is written to the file. 
 def write_output(unique_hosts, output_file_name):
 	if args.output:
 		try:
@@ -105,13 +111,7 @@ def write_output(unique_hosts, output_file_name):
 		for addr in unique_hosts:
 			print('{}{}'.format(addr.ip_addr, addr.cidr))
 
-def cli_plus_print(some_string):
-	if not args.quite:
-		print('[+] {}'.format(some_string))
-
-def cli_negative_print(some_string):
-	print('[-] {}'.format(some_string))
-
+# Takes a string and does some magic to make sure it is a valid IP
 def validate_ip(ip):
 	try:
 		octet_list = ip.split('.')
@@ -130,6 +130,7 @@ def validate_ip(ip):
 				return False
 	return True
 
+# Does some magic to create an IP object based on inputs with our without a CIDR
 def handle_mask_or_no_mask(host):
 	if '/' in host:
 		split_host = host.split('/')
@@ -147,6 +148,15 @@ def handle_mask_or_no_mask(host):
 	
 	return False
 
+# These functions handle the pretty terminal printing
+def cli_plus_print(some_string):
+	if not args.quite:
+		print('[+] {}'.format(some_string))
+
+def cli_negative_print(some_string):
+	print('[-] {}'.format(some_string))
+
+# True if the script is called from the command line
 if __name__ == '__main__':
 	banner()
 	main()
