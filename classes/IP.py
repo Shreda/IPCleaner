@@ -4,10 +4,10 @@ class IP():
     NUM_BYTES_IP = 4
     MAX_OCTET_VALUE = 255
 
-    def __init__(self, ip_addr, subnet_mask):
-        self.num_hosts_network = 0
+    def __init__(self, ip_addr, cidr='/32'):
+        self.num_hosts_network = 1
         self.ip_addr = ip_addr
-        self.cidr = subnet_mask
+        self.cidr = cidr
         self.ip_addr_binary = self.ipToBinary(self.ip_addr)
         self.subnet_mask_binary = self.maskToBinary(self.cidr)
         self.network_addr_binary = self.findNetworkAddr(self.ip_addr_binary, self.subnet_mask_binary)
@@ -69,7 +69,7 @@ class IP():
         return network_addr
 
     def set_num_hosts_network(self, num):
-        print(num)
+        # print(num)
         self.num_hosts_network = num
 
     def findBroadcastAddr(self, ip_addr, subnet_mask):
@@ -88,7 +88,11 @@ class IP():
                 zero_count += 1
             else:
                 broadcast_array.append(ip_array[i])
-        self.set_num_hosts_network(int('1'*zero_count, 2) -1)
+        if zero_count > 0:
+            self.set_num_hosts_network(int('1'*zero_count, 2) -1)
         broadcast_addr = ''.join(broadcast_array)
         return broadcast_addr
+
+    def set_cidr(self, cidr):
+        self.cidr = cidr
         
