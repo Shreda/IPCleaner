@@ -11,6 +11,7 @@ parser.add_argument("-o","--output", help="Output file", metavar="<output-file-n
 parser.add_argument("-q", "--quite", help="Output IP addresses only", action="store_true")
 parser.add_argument("-c", "--calc", help="Calculate network information for an IP")
 parser.add_argument("-s", "--search", help="File to extract IP addresses from", metavar="<input-file-to-search>")
+
 args = parser.parse_args()
 
 def banner():
@@ -49,6 +50,8 @@ def main():
 		else:
 			cli_negative_print('Not a valid IP address...')
 
+	else:
+		parser.print_help()
 
 def calc_print(ip_obj):
 	print('{:<19} {:<16} {:<34}'.format('IP Address:', ip_obj.ip_addr, ip_obj.ip_addr_binary))
@@ -140,7 +143,7 @@ def handle_mask_or_no_mask(host):
 		except:
 			cli_negative_print('Host passed in incorrect format...')
 		else:
-			if validate_ip(ip):
+			if validate_ip(ip) and validate_ip(mask):
 				return IP(ip, mask)
 				
 	elif validate_ip(host):
