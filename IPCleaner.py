@@ -139,11 +139,14 @@ def handle_mask_or_no_mask(host):
 		split_host = host.split('/')
 		try:
 			ip = split_host[0]
-			mask = '/' + split_host[1]
+			mask_no_slash = split_host[1]
+			mask_int = int(mask_no_slash)
+			mask = '/' + mask_no_slash
 		except:
 			cli_negative_print('Host passed in incorrect format...')
+			return False
 		else:
-			if validate_ip(ip) and validate_ip(mask):
+			if validate_ip(ip) and (mask_int <=32 and mask_int > 0):
 				return IP(ip, mask)
 				
 	elif validate_ip(host):
