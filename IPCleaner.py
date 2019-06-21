@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
+'''
+IPCleaner.py - A tool for searching files for IP addresses and performing subnetting on a given IP address and subnet mask.
+'''
 import argparse
 import sys
 import re
-from classes.IP import IP
+from classes.IP.IP import IP
+from classes.IP.utils import validate_ip
+from classes.IP.utils import unique
+from classes.IP.utils import sort_ips
+from classes.IP.utils import grep_ips
+from classes.IP.utils import handle_mask_or_no_mask
 
 # Global variables.
 parser = argparse.ArgumentParser()
@@ -33,10 +41,10 @@ def main():
 	if args.search:
 		input_file_name=args.search
 		output_file_name = args.output
-		host_list = get_hosts(input_file_name)
+		host_list = grep_ips(input_file_name)
 
 		if len(host_list) > 0:
-			unique_hosts = unique(host_list)
+			unique_hosts = sort_ips(unique(host_list))
 			write_output(unique_hosts, output_file_name)
 			cli_plus_print('The IPs have been cleansed...')
 		else:	
@@ -46,56 +54,12 @@ def main():
 		input_host = args.calc
 		ip_obj = handle_mask_or_no_mask(input_host)
 		if ip_obj:
-			calc_print(ip_obj)
+			print(ip_obj)
 		else:
 			cli_negative_print('Not a valid IP address...')
 
 	else:
 		parser.print_help()
-
-def calc_print(ip_obj):
-	print('{:<19} {:<16} {:<34}'.format('IP Address:', ip_obj.ip_addr, ip_obj.ip_addr_binary))
-	print('{:<19} {:<16} {:<34}'.format('Subnet Mask:', ip_obj.subnet_mask, ip_obj.subnet_mask_binary))
-	print('{:<19} {:<16} {:<34}'.format('Network Address:', ip_obj.network_addr, ip_obj.network_addr_binary))
-	print('{:<19} {:<16} {:<34}'.format('Broadcast Address:', ip_obj.broadcast_addr, ip_obj.broadcast_addr_binary))
-	print('{:<19} {:<16}'.format('Num Hosts:', ip_obj.num_hosts_network))
-
-# Takes a list of IP objects and sorts them based on their corresponding
-# IP address
-def unique(host_list):
-	unique_host_list = []
-	unique_host_objects = []
-	cli_plus_print("Removing duplicates...")
-
-	for host in host_list:
-		host_ip = host.ip_addr
-		if host_ip not in unique_host_list:
-			unique_host_list.append(host_ip)
-			unique_host_objects.append(host)
-		
-	unique_host_objects.sort(key=lambda s: list(map(int, s.ip_addr.split('.'))))
-	return unique_host_objects
-
-# Takes a file and uses a regex to find IP addresses with or withour a CIDR
-def get_hosts(file_name):
-	found_ips = []
-	try:
-		f=open(file_name, "r")
-	except:
-		cli_negative_print("Input file '{}' not found...".format(file_name))
-		sys.exit()
-	else:
-		cli_plus_print("Reading input...")
-		data = f.read()
-		f.close()
-		cli_plus_print("Searching for IP adresses...")
-		host_list = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/?\d{0,2}", data)
-		for host in host_list:
-			ip_obj = handle_mask_or_no_mask(host)
-			if ip_obj:
-				found_ips.append(ip_obj)
-				
-	return found_ips
 
 # Takes a list of IP objects and an optional filename. If a filename is given,
 # The network address and CIDR of the IP addresses is written to the file. 
@@ -113,46 +77,6 @@ def write_output(unique_hosts, output_file_name):
 	else:
 		for addr in unique_hosts:
 			print('{}{}'.format(addr.ip_addr, addr.cidr))
-
-# Takes a string and does some magic to make sure it is a valid IP
-def validate_ip(ip):
-	try:
-		octet_list = ip.split('.')
-	except:
-		return False
-	else:
-		if len(octet_list) < 4:
-			return False
-
-		for octet in octet_list:
-			try:
-				decimal = int(octet)
-				if decimal > 255 or decimal < 0:
-					return False
-			except:
-				return False
-	return True
-
-# Does some magic to create an IP object based on inputs with our without a CIDR
-def handle_mask_or_no_mask(host):
-	if '/' in host:
-		split_host = host.split('/')
-		try:
-			ip = split_host[0]
-			mask_no_slash = split_host[1]
-			mask_int = int(mask_no_slash)
-			mask = '/' + mask_no_slash
-		except:
-			cli_negative_print('Host passed in incorrect format...')
-			return False
-		else:
-			if validate_ip(ip) and (mask_int <=32 and mask_int > 0):
-				return IP(ip, mask)
-				
-	elif validate_ip(host):
-		return IP(host)
-	
-	return False
 
 # These functions handle the pretty terminal printing
 def cli_plus_print(some_string):

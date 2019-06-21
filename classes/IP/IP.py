@@ -1,7 +1,11 @@
 class IP():
+    # The number of bits in a single IP octet
     NUM_BITS_IN_OCTET = 8
+    # The number of bits in a single IP address
     NUM_BITS_IP = 32
+    # The number of bytes in a single IP address
     NUM_BYTES_IP = 4
+    # Largest value for 8 bits is 255
     MAX_OCTET_VALUE = 255
 
     def __init__(self, ip_addr, cidr='/32'):
@@ -9,10 +13,13 @@ class IP():
         self.ip_addr = ip_addr
         self.cidr = cidr
         self.ip_addr_binary = self.ipToBinary(self.ip_addr)
+        
         self.subnet_mask_binary = self.maskToBinary(self.cidr)
         self.network_addr_binary = self.findNetworkAddr(self.ip_addr_binary, self.subnet_mask_binary)
         self.network_addr = self.binaryToDecimal(self.network_addr_binary)
+
         self.subnet_mask = self.binaryToDecimal(self.subnet_mask_binary)
+        
         self.broadcast_addr_binary = self.findBroadcastAddr(self.ip_addr_binary, self.subnet_mask_binary)
         self.broadcast_addr = self.binaryToDecimal(self.broadcast_addr_binary)
     
@@ -49,11 +56,16 @@ class IP():
             return binary_mask
 
     def findNetworkAddr(self, ip_addr, subnet_mask):
+        '''
+        Given a particular IP address and subnet mask (in binary format), calculates the network address.
+        For example: The IP/CIDR 192.168.1.1/24 would have the following network address -> 192.168.1.0.
+
+        The network address, is the first address in a particular subnet and cannot be used for hosts.
+        '''
         ip_array = []
         subnet_array = []
         network_array = []
-        # print(ip_addr)
-        # print(subnet_mask)
+
         for x in range(len(ip_addr)):
             ip_array.append(ip_addr[x])
             subnet_array.append(subnet_mask[x])
@@ -69,10 +81,15 @@ class IP():
         return network_addr
 
     def set_num_hosts_network(self, num):
-        # print(num)
         self.num_hosts_network = num
 
     def findBroadcastAddr(self, ip_addr, subnet_mask):
+        '''
+        Given a particular IP address and subnet mask, calculates the broadcast address of the network.
+        For example: The IP/CIDR 192.168.1.1/24 would have the following broadcast address -> 192.168.1.255.
+
+        The broadcast address is the last address in a subnet and is used to address all hosts.
+        '''
         ip_array = []
         subnet_array = []
         broadcast_array = []
@@ -95,4 +112,16 @@ class IP():
 
     def set_cidr(self, cidr):
         self.cidr = cidr
+
+    def set_ip_addr(self, ip_string):
+        pass
+
+    def __str__(self):
+        s = ""
+        s += '{:<19} {:<16} {:<34}\n'.format('IP Address:', self.ip_addr, self.ip_addr_binary)
+        s += '{:<19} {:<16} {:<34}\n'.format('Subnet Mask:', self.subnet_mask, self.subnet_mask_binary)
+        s += '{:<19} {:<16} {:<34}\n'.format('Network Address:', self.network_addr, self.network_addr_binary)
+        s += '{:<19} {:<16} {:<34}\n'.format('Broadcast Address:', self.broadcast_addr, self.broadcast_addr_binary)
+        s += '{:<19} {:<16}'.format('Num Hosts:', self.num_hosts_network)
+        return s
         
