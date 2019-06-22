@@ -35,10 +35,11 @@ def banner():
 )
 
 def main():
-	if args.search:
-		input_file_name=args.search
+	if args.input:
+		input_file_name=args.input
 		output_file_name = args.output
 		grepr = IPGrepr(input_file_name)
+		grepr.grep()
 
 		if len(grepr.ips) > 0:
 			grepr.sort()

@@ -24,9 +24,7 @@ class IP():
         self.broadcast_addr = self.binaryToDecimal(self.broadcast_addr_binary)
     
     def binaryToDecimal(self, binary_num):
-        # print(binary_num)
         binary_octets = [binary_num[i:i+self.NUM_BITS_IN_OCTET] for i in range(0, len(binary_num), self.NUM_BITS_IN_OCTET)]
-        # print(binary_octets)
         decimal_octets = []
         for octet in binary_octets:
             decimal_octets.append(str(int(octet, 2)))
