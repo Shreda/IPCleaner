@@ -3,8 +3,9 @@ import re
 from classes.IP.utils import handle_mask_or_no_mask
 
 class IPGrepr():
-    def __init__(self, filename):
+    def __init__(self, filename, output):
         self.filename = filename
+        self.output = output
         self.ips = []
 
     def grep(self):
@@ -16,13 +17,11 @@ class IPGrepr():
         try:
             f=open(self.filename, "r")
         except:
-            # cli_negative_print("Input file '{}' not found...".format(file_name))
+            self.output.errorstdio("Input file '{}' not found...".format(self.filename))
             sys.exit()
         else:
-            # cli_plus_print("Reading input...")
             data = f.read()
             f.close()
-            # cli_plus_print("Searching for IP adresses...")
             host_list = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/?\d{0,2}", data)
             for host in host_list:
                 ip_obj = handle_mask_or_no_mask(host)
@@ -61,10 +60,8 @@ class IPGrepr():
             try:
                 f = open(outputfile, "w+")
             except:
-                # cli_negative_print('Unable to create file to write output...')
                 sys.exit()
             else:
-                # cli_plus_print("Writing IPs to {}".format(output_file_name))
                 for addr in self.ips:
                     f.write("\n{}{}".format(addr.network_addr, addr.cidr))
         else:
