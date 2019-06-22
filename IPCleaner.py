@@ -6,19 +6,16 @@ import argparse
 import sys
 import re
 from classes.IP.IP import IP
+from classes.IP.IPGrepr import IPGrepr
 from classes.IP.utils import validate_ip
-from classes.IP.utils import unique
-from classes.IP.utils import sort_ips
-from classes.IP.utils import grep_ips
 from classes.IP.utils import handle_mask_or_no_mask
 
 # Global variables.
 parser = argparse.ArgumentParser()
-# parser.add_argument("input", help="Input file to extract IP addresses from.", metavar="<input-file-name>")
 parser.add_argument("-o","--output", help="Output file", metavar="<output-file-name>")
 parser.add_argument("-q", "--quite", help="Output IP addresses only", action="store_true")
 parser.add_argument("-c", "--calc", help="Calculate network information for an IP")
-parser.add_argument("-s", "--search", help="File to extract IP addresses from", metavar="<input-file-to-search>")
+parser.add_argument("-i", "--input", help="File to extract IP addresses from", metavar="<input-file-to-search>")
 
 args = parser.parse_args()
 
@@ -41,12 +38,17 @@ def main():
 	if args.search:
 		input_file_name=args.search
 		output_file_name = args.output
-		host_list = grep_ips(input_file_name)
+		grepr = IPGrepr(input_file_name)
 
-		if len(host_list) > 0:
-			unique_hosts = sort_ips(unique(host_list))
-			write_output(unique_hosts, output_file_name)
-			cli_plus_print('The IPs have been cleansed...')
+		if len(grepr.ips) > 0:
+			grepr.sort()
+			grepr.unique()
+			if args.output:
+				grepr.write(output_file_name)
+
+			else:
+				grepr.write()
+
 		else:	
 			cli_negative_print("No IP addresses found.")
 
@@ -60,23 +62,6 @@ def main():
 
 	else:
 		parser.print_help()
-
-# Takes a list of IP objects and an optional filename. If a filename is given,
-# The network address and CIDR of the IP addresses is written to the file. 
-def write_output(unique_hosts, output_file_name):
-	if args.output:
-		try:
-			unique_host_file = open(output_file_name, "w+")
-		except:
-			cli_negative_print('Unable to create file to write output...')
-			sys.exit()
-		else:
-			cli_plus_print("Writing IPs to {}".format(output_file_name))
-			for addr in unique_hosts:
-				unique_host_file.write("\n{}{}".format(addr.network_addr, addr.cidr))
-	else:
-		for addr in unique_hosts:
-			print('{}{}'.format(addr.ip_addr, addr.cidr))
 
 # These functions handle the pretty terminal printing
 def cli_plus_print(some_string):

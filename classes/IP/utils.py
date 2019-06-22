@@ -21,57 +21,6 @@ def validate_ip(ip):
                 return False
     return True
 
-
-def sort_ips(IP_obj_list):
-    '''
-    Takes a list of IP objects as input sorts them and returns them.
-    '''
-    IP_obj_list.sort(key=lambda s: list(map(int, s.ip_addr.split('.'))))
-    return IP_obj_list
-
-
-def unique(IP_obj_list):
-    '''
-    Takes a list of IP objects as input and removes duplicate entries based on
-    the stored ip_addr string.
-    '''
-    unique_host_list = []
-    unique_host_objects = []
-
-    for host in IP_obj_list:
-        host_ip = host.ip_addr
-        if host_ip not in unique_host_list:
-            unique_host_list.append(host_ip)
-            unique_host_objects.append(host)
-        
-    return unique_host_objects
-
-
-def grep_ips(file_name):
-    '''
-    Takes a file as input and uses a regular expression to find regular IP addresses with or without a CIDR.
-    From this, it creates IP objects and returns them in a list.
-    '''
-    found_ips = []
-    try:
-        f=open(file_name, "r")
-    except:
-        # cli_negative_print("Input file '{}' not found...".format(file_name))
-        sys.exit()
-    else:
-        # cli_plus_print("Reading input...")
-        data = f.read()
-        f.close()
-        # cli_plus_print("Searching for IP adresses...")
-        host_list = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/?\d{0,2}", data)
-        for host in host_list:
-            ip_obj = handle_mask_or_no_mask(host)
-            if ip_obj:
-                found_ips.append(ip_obj)
-				
-    return found_ips
-
-
 # Does some magic to create an IP object based on inputs with our without a CIDR
 def handle_mask_or_no_mask(host):
 	if '/' in host:
