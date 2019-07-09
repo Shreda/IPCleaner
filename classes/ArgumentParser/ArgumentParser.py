@@ -74,5 +74,6 @@ class ArgumentParser(object):
         parser.add_option_group(search)
         parser.add_option_group(calc)
         parser.add_option_group(general)
+        parser.add_option_group(expand)
         options, arguments = parser.parse_args()
         return options        

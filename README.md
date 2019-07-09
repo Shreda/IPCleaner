@@ -31,6 +31,10 @@ Options:
 
   General Settings:
     -q, --quite         Reduce stdio ouput
+
+  Expansion settings:
+    -e EXPAND, --expand=EXPAND
+                        Print all addresses in a network
 ```
 
 ## Examples 
@@ -59,4 +63,16 @@ Subnet Mask:        255.255.255.240  11111111111111111111111111110000
 Network Address:    192.168.1.0      11000000101010000000000100000000  
 Broadcast Address:  192.168.1.15     11000000101010000000000100001111  
 Num Hosts:          14  
+```
+
+4. You want to print all IP addresses in a network
+```
+./IPCleaner.py --expand 192.168.1.10/24
+
+192.168.1.0
+192.168.1.1
+192.168.1.2
+...
+...
+192.168.1.255
 ```
