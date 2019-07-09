@@ -35,6 +35,14 @@ class Controller():
             else:
                 output.errorstdio('Not a valid IP address...')
 
+        elif self.args.expand:
+            input_host = self.args.expand
+            ip_obj = handle_mask_or_no_mask(input_host)
+            if ip_obj:
+                ip_obj.print_network()
+            else:
+                output.errorstdio('Not a valid IP address...')
+
         else:
             pass
 

@@ -40,5 +40,6 @@ def handle_mask_or_no_mask(host):
 	elif validate_ip(host):
 		return IP(host)
 	
-	return False    
+	return False
+
 

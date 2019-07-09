@@ -9,6 +9,7 @@ class ArgumentParser(object):
         self.sort = options.sort
         self.unique = options.unique
         self.quite = options.quite
+        self.expand = options.expand
 
 
     def parseArgs(self):
@@ -16,6 +17,7 @@ class ArgumentParser(object):
         calc = OptionGroup(parser, 'Calculation settings')
         search = OptionGroup(parser, 'Search Settings')
         general = OptionGroup(parser, 'General Settings')
+        expand = OptionGroup(parser, 'Expansion settings')
         # Search options
         search.add_option(
             '-i', 
@@ -53,6 +55,14 @@ class ArgumentParser(object):
             type='string'
         )
 
+        # Expand options
+        expand.add_option(
+            '-e',
+            '--expand',
+            help='Print all addresses in a network',
+            action='store',
+            type='string'
+        )
         # General options
         general.add_option(
             '-q',

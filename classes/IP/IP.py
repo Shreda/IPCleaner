@@ -52,6 +52,7 @@ class IP():
             binary_mask = '1'*num_bits + '0'*num_missing_zeros
             
             return binary_mask
+            
 
     def findNetworkAddr(self, ip_addr, subnet_mask):
         '''
@@ -113,6 +114,26 @@ class IP():
 
     def set_ip_addr(self, ip_string):
         pass
+
+    
+    def bin_string_to_int(self, bin_string):
+        return int(bin_string, 2)
+
+    def int_to_bin_string(self, num, padding):
+        return "{0:b}".format(num).zfill(padding)
+
+    def print_network(self):
+        '''
+        Using the network and broadcast address, print every IP address.
+        '''
+        lower = self.bin_string_to_int(self.network_addr_binary)
+        upper = self.bin_string_to_int(self.broadcast_addr_binary)
+
+        while lower <= upper:
+            print(self.binaryToDecimal(self.int_to_bin_string(lower, 32)))
+            # print(lower)
+            lower+=1
+         
 
     def __str__(self):
         s = ""
